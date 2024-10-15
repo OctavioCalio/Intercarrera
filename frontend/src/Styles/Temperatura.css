@@ -1,0 +1,20 @@
+.temperatura-container {
+    display: flex;
+    flex-direction: column; /* Cambia la dirección del flex a columna para poner el texto arriba */
+    align-items: center; /* Alinea el contenido a la izquierda */
+    margin-right: 40px;
+  }
+  
+  .Temperatura-title {
+    font-size: 20px;
+    color: #FCEE4A;
+    font-family: 'Press Start 2P';
+  }
+  
+  .Temperatura-value {    
+    text-align: center;
+    font-size: 35px;
+    color: #ffffff;
+    font-family: 'Press Start 2P';
+    margin-bottom: 5px; 
+  }

@@ -1,0 +1,20 @@
+.Datos {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: -200px; /* Añade espacio entre los elementos */
+  }
+  
+  
+  .Life {
+    flex: 1;
+  }
+  
+  .Temperatura {
+    flex: 2; /* Da más espacio a la Temperatura */
+    text-align: center;
+  }
+  
+  .Estado {
+    text-align: right;
+  }

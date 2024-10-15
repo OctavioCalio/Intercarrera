@@ -1,0 +1,78 @@
+const mqtt = require('mqtt');
+const mongoose = require('mongoose');
+
+// Conectar a la base de datos MongoDB
+mongoose.connect('mongodb://localhost:27017/temperaturas', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log('Conectado a MongoDB');
+}).catch(err => {
+    console.error('Error al conectar a MongoDB:', err);
+});
+
+// Definir el esquema y modelo
+const temperaturaSchema = new mongoose.Schema({
+    valor: { type: Number, required: true },
+    estado: { type: String, required: true },
+    fecha: { type: Date, default: Date.now }  // Timestamp por defecto
+});
+
+const Temperatura = mongoose.model('Temperatura', temperaturaSchema);
+
+// Conectar al broker MQTT
+const client = mqtt.connect('mqtt://test.mosquitto.org');
+
+// Umbrales de temperatura
+const THRESHOLD_COLD = 15;  // Menor o igual a 15°C = Frío
+const THRESHOLD_HOT = 30;   // Mayor o igual a 30°C = Caluroso
+
+client.on('connect', () => {
+    console.log('Conectado al broker MQTT');
+    
+    client.subscribe('prueba', (err) => {
+        if (!err) {
+            console.log('Suscrito al tema prueba');
+        }
+    });
+});
+
+client.on('message', async (topic, message) => {
+    if (topic === 'prueba') {
+        const tempString = message.toString().trim();
+        const temperatura = parseFloat(tempString);
+
+        if (isNaN(temperatura)) {
+            console.error(`Mensaje recibido no es un número válido: '${tempString}'`);
+            return;
+        }
+
+        console.log(`Temperatura recibida: ${temperatura}°C`);
+        
+        let estado;
+        if (temperatura <= THRESHOLD_COLD) {
+            estado = 'frio';
+        } else if (temperatura >= THRESHOLD_HOT) {
+            estado = 'caluroso';
+        } else {
+            estado = 'normal';
+        }
+
+        // Publicar el estado
+        client.publish('sensor/estado', `El estado es: ${estado}`);
+        console.log(`Estado publicado: ${estado}`);
+
+        // Almacenar en la base de datos
+        const nuevaTemperatura = new Temperatura({ valor: temperatura, estado });
+        try {
+            await nuevaTemperatura.save();
+            console.log(`Temperatura ${temperatura}°C almacenada en la base de datos con estado '${estado}'`);
+        } catch (error) {
+            console.error('Error al almacenar la temperatura en la base de datos:', error);
+        }
+    }
+});
+
+client.on('error', (error) => {
+    console.error('Error en la conexión MQTT:', error);
+});

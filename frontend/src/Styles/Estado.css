@@ -1,0 +1,17 @@
+.estado-container {
+    display: flex;
+    flex-direction: column; /* Cambia la dirección del flex a columna para poner el texto arriba */
+    align-items: flex-end; /* Alinea el contenido a la izquierda */
+  }
+  
+  .estado-title {
+    font-size: 15px;
+    color: #FCEE4A;
+    font-family: 'Press Start 2P';
+  }
+  
+  .estado-value {    
+    font-size: 25px;
+    color: #8EE367;
+    font-family: 'Press Start 2P';
+  }

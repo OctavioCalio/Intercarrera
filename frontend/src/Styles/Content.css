@@ -1,0 +1,45 @@
+/* Content.css */
+
+.title {
+  width: 65%; /* Ajusta este valor según tus necesidades */
+  height: auto; /* Mantiene la relación de aspecto */
+  display: block; /* Asegura que no haya espacios debajo de la imagen */
+  margin: 0 auto; /* Centra la imagen dentro del contenedor */
+}
+
+.alien {
+  width: 32vh;
+  height: auto;
+  display: block;
+  margin: 35px auto;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+/* Content.css */
+.login-message {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 25px;
+  color: #FCEE4A;
+  margin-top: 15px;
+  font-family: 'Press Start 2P', cursive;
+  text-decoration: underline;
+
+  animation: fadeInOut 3s infinite;
+}
+
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 1;
+  }
+  20% {
+    opacity: 0;
+  }
+}
