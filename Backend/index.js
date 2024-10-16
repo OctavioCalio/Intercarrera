@@ -29,13 +29,26 @@ const client = mqtt.connect('mqtt://broker.hivemq.com');
 //const THRESHOLD_HOT = 40;   // Mayor o igual a 40°C = Caluroso
 
 //Nuevos estados:
-const Insolacion = 40;
+/*
+const Insolacion = 39;
 const caliente = 37;
 const caluroso = 35;
 const ideal = 33;
 const fresco = 31;
 const frio = 29;
 const hipotermia = 27;
+*/
+const rangosTemperatura = {
+    ideal: { min: 32, max: 34 },
+    caluroso: { min: 34, max: 36 },
+    caliente: { min: 36, max: 38 },
+    insolacion: { min: 38, max: 40 },
+    extremoInsolacion: { min: 40, max: 42 },
+    hipotermia: { min: 26, max: 28 },
+    frio: { min: 28, max: 30 },
+    fresco: { min: 30, max: 32 },
+    extremoHipotermia: { min: 24, max: 26 },
+};
 
 
 
@@ -99,32 +112,31 @@ client.on('message', async (topic, message) => {
                 estado = 'normal';
             }
             */
-            if (temperatura >= Insolacion) {
-                console.log('Estado: Insolación');
-                estado = 'Insolación';
-            } else if (temperatura >= caliente) {
-                console.log('Estado: Caliente');
-                estado = 'Caliente';
-            } else if (temperatura >= caluroso) {
-                console.log('Estado: Caluroso');
-                estado = 'Caluroso';
-            } else if (temperatura >= ideal) {
-                console.log('Estado: Ideal');
-                estado = 'Ideal';
-            } else if (temperatura >= fresco) {
-                console.log('Estado: Fresco');
-                estado = 'Fresco';
-            } else if (temperatura >= frio) {
-                console.log('Estado: Frío');
-                estado = 'Frío';
-            } else if (temperatura >= hipotermia) {
-                console.log('Estado: Hipotermia');
-                estado = 'Hipotermia';
-            } else {
+            if (temperatura > 40.9 || temperatura < 25.9) {
                 console.log('Estado: Crítico, fuera de rango');
                 estado = 'Crítico';
+            } else if (temperatura >= rangosTemperatura.insolacion.min && temperatura <= rangosTemperatura.insolacion.max) {
+                console.log('Estado: Insolación');
+                estado = 'Insolación';
+            } else if (temperatura >= rangosTemperatura.caliente.min && temperatura <= rangosTemperatura.caliente.max) {
+                console.log('Estado: Caliente');
+                estado = 'Caliente';
+            } else if (temperatura >= rangosTemperatura.caluroso.min && temperatura <= rangosTemperatura.caluroso.max) {
+                console.log('Estado: Caluroso');
+                estado = 'Caluroso';
+            } else if (temperatura >= rangosTemperatura.ideal.min && temperatura <= rangosTemperatura.ideal.max) {
+                console.log('Estado: Ideal');
+                estado = 'Ideal';
+            } else if (temperatura >= rangosTemperatura.fresco.min && temperatura <= rangosTemperatura.fresco.max) {
+                console.log('Estado: Fresco');
+                estado = 'Fresco';
+            } else if (temperatura >= rangosTemperatura.frio.min && temperatura <= rangosTemperatura.frio.max) {
+                console.log('Estado: Frío');
+                estado = 'Frío';
+            } else if (temperatura >= rangosTemperatura.hipotermia.min && temperatura <= rangosTemperatura.hipotermia.max) {
+                console.log('Estado: Hipotermia');
+                estado = 'Hipotermia';
             }
-
 
             // Publicar el estado en el broker MQTT, estos es lo que enviamos a TSH
             client.publish('estado', `El estado es: ${estado}`);

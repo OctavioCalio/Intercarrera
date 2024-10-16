@@ -19,14 +19,14 @@ const Datos = () => {
     };
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log('Mensaje recibido desde el front:', data);
+      console.log('Mensaje recibido:', data);
 
 
       //actualizar el estdo y la temperatura
       setTemperatura(data.temperatura);
       setEstado(data.estado);
       console.log('Estado actualizado:', estado);
-      
+
       if (data.estado === 'Insolación') {
         setVidaActual(2);
       } else if (data.estado === 'Caliente') {
@@ -43,9 +43,10 @@ const Datos = () => {
         setVidaActual(2);
       } else if (data.estado === 'Crítico') {
         setVidaActual(1);
-      }};
+      }
+    };
 
-    
+
 
 
     ws.onclose = () => {
@@ -57,48 +58,55 @@ const Datos = () => {
     return () => {
       ws.close();
     };
-  }, []);
+  }, [estado, temperatura, vidaActual]);
 
   const handleClick = () => {
     setVidaActual(prevVida => {
+      //vida máxima 5
+
       const nuevaVida = Math.min(prevVida + 1, 5);
+      let nuevaTemperatura = temperatura;
 
-      if (nuevaVida === 5) {
+
+      if (nuevaTemperatura > 34) {
+        nuevaTemperatura -= 1;
+      } else if (nuevaTemperatura < 32) {
+        nuevaTemperatura += 1;
+      }
+
+      setTemperatura(nuevaTemperatura);
+
+
+      if (nuevaTemperatura >= 32 && nuevaTemperatura <= 34) {
         setEstado('Ideal');
-        setTemperatura(33); // Temp ideal
-      }
-      else if (nuevaVida === 4 && temperatura >= 35) {
-        setEstado('Caluroso');
-        setTemperatura(35);
-      }
-      else if (nuevaVida === 3 && temperatura >= 37) {
-        setEstado('Caliente');
-        setTemperatura(37);
-      }
-      else if (nuevaVida === 2 && temperatura >= 39) {
-        setEstado('Insolación');
-        setTemperatura(39);
-      }
-
-
-
-      else if (nuevaVida === 4 && temperatura >= 31) {
+        setVidaActual(5); // Vida máxima
+      } else if (nuevaTemperatura >= 30 && nuevaTemperatura < 32) {
         setEstado('Fresco');
-        setTemperatura(31);
-      }
-      else if (nuevaVida === 3 && temperatura >= 29) {
+        setVidaActual(4);
+      } else if (nuevaTemperatura >= 28 && nuevaTemperatura < 30) {
         setEstado('Frío');
-        setTemperatura(29);
-      }
-      else if (nuevaVida === 2 && temperatura >= 27) {
+        setVidaActual(3);
+      } else if (nuevaTemperatura >= 26 && nuevaTemperatura < 28) {
         setEstado('Hipotermia');
-        setTemperatura(27);
-      }
-      else if ( nuevaVida === 1) {
+        setVidaActual(2);
+      } else if (nuevaTemperatura >= 24 && nuevaTemperatura < 26) {
         setEstado('Crítico');
-
+        setVidaActual(1);
+      } else if (nuevaTemperatura > 34 && nuevaTemperatura <= 36) {
+        setEstado('Caluroso');
+        setVidaActual(4);
+      } else if (nuevaTemperatura > 36 && nuevaTemperatura <= 38) {
+        setEstado('Caliente');
+        setVidaActual(3);
+      } else if (nuevaTemperatura > 38 && nuevaTemperatura <= 40) {
+        setEstado('Insolación');
+        setVidaActual(2);
+      } else if (nuevaTemperatura > 40) {
+        setEstado('Crítico');
+        setVidaActual(1);
       }
-      return nuevaVida; // Actualizamos la vida
+
+      return nuevaVida;
     });
   };
 
@@ -110,7 +118,7 @@ const Datos = () => {
       <FeedButton handleClick={handleClick}></FeedButton>
     </div>
 
-   
+
 
   );
 };
