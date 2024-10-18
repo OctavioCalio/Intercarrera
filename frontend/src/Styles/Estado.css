@@ -1,17 +1,44 @@
 .estado-container {
-    display: flex;
-    flex-direction: column; /* Cambia la dirección del flex a columna para poner el texto arriba */
-    align-items: flex-end; /* Alinea el contenido a la izquierda */
-  }
-  
-  .estado-title {
-    font-size: 15px;
-    color: #FCEE4A;
-    font-family: 'Press Start 2P';
-  }
-  
-  .estado-value {    
-    font-size: 25px;
-    color: #8EE367;
-    font-family: 'Press Start 2P';
-  }
+  display: flex;
+  flex-direction: column; /* Mantiene la dirección en columna */
+  align-items: flex-end; /* Cambiado a alinear a la derecha */
+  margin-right: 20px; /* Añadido margen a la derecha para separar del borde */
+}
+
+.estado-title {
+  font-size: 15px;
+  color: #FCEE4A; /* Amarillo */
+  font-family: 'Press Start 2P', cursive;
+  margin-bottom: 5px; /* Añadido margen inferior para espaciar el título del valor */
+  text-transform: uppercase; /* Convertir el texto a mayúsculas */
+  letter-spacing: 1px; /* Espaciado entre letras */
+}
+
+.estado-value {    
+  font-size: 25px;
+  color: #8EE367; /* Verde claro */
+  font-family: 'Press Start 2P', cursive;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Sombra en el texto para más contraste */
+  letter-spacing: 2px; /* Aumentar el espaciado entre letras */
+}
+.estado-container {
+  text-align: center;
+}
+
+
+/* Clases para cambiar el color según el estado */
+.estado-ideal {
+  color: #8EE367;
+}
+
+.estado-frio {
+  color: #00BFFF; /* Azul celeste frío */
+}
+
+.estado-caliente {
+  color: rgb(247, 119, 33);
+}
+
+.estado-muerto {
+  color: gray;
+}

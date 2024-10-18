@@ -1,15 +1,32 @@
 import React from 'react';
-import '../Styles/Estado.css'; // Asegúrate de crear este archivo CSS
-import { useState, useEffect } from 'react';
+import '../Styles/Estado.css'; // Asegúrate de tener el archivo CSS
 
+const Estado = ({ estado, vidaActual }) => {
+  // Definir la clase del estado basado en el valor del estado o la vida actual
+  const getEstadoClass = (estado, vidaActual) => {
+    if (vidaActual === 0) {
+      return 'estado-muerto'; // Si la vida es 0, estado es Muerto
+    }
+    switch (estado) {
+      case 'Ideal':
+        return 'estado-ideal';
+      case 'Frío':
+        return 'estado-frio';
+      case 'Caluroso':
+        return 'estado-caliente';
+      default:
+        return '';
+    }
+  };
 
+  // Definir el estado mostrado basado en la vida
+  const mostrarEstado = vidaActual === 0 ? 'Muerto' : estado;
 
-const Estado = ({estado}) => {
- 
   return (
     <div className="estado-container">
       <h2 className="estado-title">Estado</h2>
-      <h3 className="estado-value">{estado}</h3>
+      {/* Aplicar la clase según el estado o la vida */}
+      <h3 className={`estado-value ${getEstadoClass(mostrarEstado, vidaActual)}`}>{mostrarEstado}</h3>
     </div>
   );
 };

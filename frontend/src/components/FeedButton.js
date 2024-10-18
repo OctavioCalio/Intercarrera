@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../Styles/FeedButton.css';
 
-const FeedButton = () => {
+const FeedButton = ({ onClick, disabled }) => {
   const [mensaje, setMensaje] = useState(''); // Estado para manejar el mensaje
 
   const handleClick = async () => {
@@ -30,7 +30,11 @@ const FeedButton = () => {
 
   return (
     <div>
-      <button className="btn btn-primary-curar" onClick={handleClick}>
+      <button 
+        className="btn btn-primary-curar" 
+        onClick={handleClick} 
+        disabled={disabled} // Deshabilitar el botón según la prop
+      >
         Curar
       </button>
       {mensaje && <p className="mensaje">{mensaje}</p>} {/* Muestra el mensaje si existe */}
