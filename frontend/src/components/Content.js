@@ -4,6 +4,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import Spinner from 'react-bootstrap/Spinner';
 import Datos from "./Datos";
 import FeedButton from "./FeedButton";
+import RevivirButton from "./RevivirButton"; 
 
 const Content = () => {
   const { user, isAuthenticated, isLoading } = useAuth0();
@@ -21,7 +22,7 @@ const Content = () => {
       case 'Ideal':
         return '/Images/alien-normal-big.gif';
       default:
-        return '/Images/alien-normal-big.gif'; // Imagen por defecto
+        return '/Images/alien-normal-big.gif'; 
     }
   };
 
@@ -39,8 +40,10 @@ const Content = () => {
           <Datos setEstado={setEstado}></Datos> 
           {/* Renderizar la imagen dependiendo del estado */}
           <img src={getImagen(estado)} alt="App Icon" className="alien" />
-          {/* Deshabilitar el botón si el estado es 'Muerto' */}
+          {/* Deshabilitar el botón de curar si el estado es 'Muerto' */}
           <FeedButton disabled={estado === 'Muerto'}></FeedButton>
+          {/* Agregar el botón de revivir y deshabilitarlo si el estado es 'Ideal' o 'Muerto' */}
+          <RevivirButton disabled={estado !== 'Muerto'}></RevivirButton>
         </div>
       ) : (
         <div className="content">

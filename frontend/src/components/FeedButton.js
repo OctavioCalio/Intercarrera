@@ -37,7 +37,7 @@ const FeedButton = ({ onClick, disabled }) => {
       >
         Curar
       </button>
-      {mensaje && <p className="mensaje">{mensaje}</p>} {/* Muestra el mensaje si existe */}
+      {/* {mensaje && <p className="mensaje">{mensaje}</p>} Muestra el mensaje si existe */}
     </div>
   );
 };

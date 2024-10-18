@@ -1,0 +1,16 @@
+/* Estilos para el botón de revivir */
+.btn-primary-revivir {
+    margin-top: 20px;
+    background-color: #4CAF50; /* Cambia el color de fondo para el botón de revivir */
+    border-color: #4CAF50; /* Cambia también el borde */
+    color: white; /* Color del texto */
+    font-size: 1rem; /* Aumenta el tamaño de la fuente */
+    padding: 10px 20px; /* Aumenta el tamaño del botón */
+    border-radius: 8px; /* Ajusta el radio del borde para que el botón tenga bordes más suaves */
+    font-family: 'Press Start 2P';
+  }
+  
+  .btn-primary-revivir:hover {
+    background-color: #45a049; /* Color al hacer hover para el botón de revivir */
+    border-color: #45a049;
+  }
