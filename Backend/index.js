@@ -1,6 +1,17 @@
+// Importar las dependencias necesarias
+const express = require('express');
 const mqtt = require('mqtt');
 const mongoose = require('mongoose');
 const WebSocket = require('ws');
+const cors = require('cors');
+
+// Configuración del servidor Express
+const app = express();
+const port = 3001;
+
+// Middleware para permitir CORS y parsear JSON
+app.use(cors());
+app.use(express.json());
 
 // Conectar a la base de datos MongoDB
 mongoose.connect('mongodb+srv://rabbiafacundo:FACUNDO@cluster0.yy82i.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
@@ -33,6 +44,11 @@ const rangosTemperatura = {
 // Crear el servidor WebSocket
 const wss = new WebSocket.Server({ port: 8080 });
 
+// Variables de estado
+let estadoActual = null;
+let vidaActual = 5; // Vida inicial
+let intervaloVida = null;
+
 // Función para enviar datos a todos los clientes conectados por WebSocket
 function broadcast(data) {
     console.log('Enviando datos a todos los clientes conectados: ', data);
@@ -52,6 +68,32 @@ wss.on('connection', (ws) => {
     });
 });
 
+// Nueva ruta para incrementar la vida
+app.post('/curar', (req, res) => {
+    const { vida } = req.body; // Extraer la vida del cuerpo de la solicitud
+
+    // Validar que la vida es un número y está en un rango válido
+    if (typeof vida !== 'number' || vida <= 0) {
+        return res.status(400).json({ error: 'Cantidad de vida no válida.' });
+    }
+
+    vidaActual = Math.min(5, vidaActual + vida); // Incrementar vida actual sin exceder 5
+    console.log(`Vida incrementada a: ${vidaActual}`);
+
+    broadcast({
+        estado: estadoActual,
+        vida: vidaActual
+    });
+
+    res.status(200).json({ message: `Vida incrementada a ${vidaActual}` });
+});
+
+// Iniciar el servidor Express
+app.listen(port, () => {
+    console.log(`Servidor Express escuchando en http://localhost:${port}`);
+});
+
+// Conexiones MQTT
 client.on('connect', () => {
     console.log('Conectado al broker MQTT');
 
@@ -62,10 +104,7 @@ client.on('connect', () => {
     });
 });
 
-let estadoActual = null;
-let vidaActual = 5;
-let intervaloVida = null;
-
+// Manejar los mensajes de MQTT
 client.on('message', async (topic, message) => {
     if (topic === 'ete') {
         const msgString = message.toString().trim();
@@ -93,7 +132,7 @@ client.on('message', async (topic, message) => {
                 nuevoEstado = 'Ideal';
             }
 
-            // Actualizamos el estado si cambia, pero no reiniciamos la vida
+            // Actualizamos el estado si cambia
             if (nuevoEstado !== estadoActual) {
                 estadoActual = nuevoEstado;
                 clearInterval(intervaloVida); // Reiniciar el intervalo si el estado cambia
@@ -139,6 +178,7 @@ function chequearVida() {
     }
 }
 
+// Manejo de errores de MQTT
 client.on('error', (error) => {
     console.error('Error en la conexión MQTT:', error);
 });
