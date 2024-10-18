@@ -48,6 +48,7 @@ const wss = new WebSocket.Server({ port: 8080 });
 let estadoActual = null;
 let vidaActual = 5; // Vida inicial
 let intervaloVida = null;
+let temperaturaActual = null;
 
 // Función para enviar datos a todos los clientes conectados por WebSocket
 function broadcast(data) {
@@ -58,6 +59,17 @@ function broadcast(data) {
         }
     });
 }
+
+function actualizarTemperatura(nuevaTemperatura) {
+    temperaturaActual = nuevaTemperatura;
+    console.log(`Temperatura actualizada a: ${temperaturaActual}°C`);
+}
+
+
+function obtenerTemperatura() {
+    return temperaturaActual;
+}
+
 
 // WebSocket: Conexión inicial
 wss.on('connection', (ws) => {
@@ -80,9 +92,13 @@ app.post('/curar', (req, res) => {
     vidaActual = Math.min(5, vidaActual + vida); // Incrementar vida actual sin exceder 5
     console.log(`Vida incrementada a: ${vidaActual}`);
 
+    const temperatura = obtenerTemperatura(); // Obtener la temperatura actual
+    console.log(`Temperatura al curar: ${temperatura}°C`);
+
     broadcast({
         estado: estadoActual,
-        vida: vidaActual
+        vida: vidaActual,
+        temperatura
     });
 
     res.status(200).json({ message: `Vida incrementada a ${vidaActual}` });
@@ -100,10 +116,15 @@ app.post('/revivir', (req, res) => {
 
     console.log('El sistema ha sido revivido. Vida restaurada a 5 y estado cambiado a "Ideal".');
 
+    const temperatura = obtenerTemperatura(); // Obtener la temperatura actual
+    console.log(`Temperatura al revivir: ${temperatura}°C`);
+
+
     // Enviar actualización a los clientes WebSocket
     broadcast({
         estado: estadoActual,
-        vida: vidaActual
+        vida: vidaActual,
+        temperatura
     });
 
     res.status(200).json({ message: 'Sistema revivido con vida completa y estado "Ideal".' });
@@ -126,6 +147,10 @@ client.on('connect', () => {
 });
 
 // Manejar los mensajes de MQTT
+
+
+
+
 client.on('message', async (topic, message) => {
     if (topic === 'ete') {
         const msgString = message.toString().trim();
@@ -141,6 +166,9 @@ client.on('message', async (topic, message) => {
             }
 
             console.log(`Temperatura recibida: ${temperatura}°C, Humedad recibida: ${humedad}%`);
+
+  
+            
 
             let nuevoEstado;
             if (temperatura > 40 || temperatura < 25) {
@@ -174,6 +202,12 @@ client.on('message', async (topic, message) => {
             await nuevaTemperatura.save();
             console.log(`Temperatura ${temperatura}°C y Humedad ${humedad}% almacenadas en la base de datos con estado '${estadoActual}'`);
 
+
+            actualizarTemperatura(temperatura);
+            console.log('Temperatura actualizada en constante a: ' + temperatura);	
+
+            
+
         } catch (error) {
             console.error(`Error al parsear el mensaje: ${msgString}`, error);
         }
@@ -190,9 +224,14 @@ function chequearVida() {
             clearInterval(intervaloVida);
             console.log('Estado actual: Muerto');
         }
+       
+        const temperatura = obtenerTemperatura(); // Obtener la temperatura actual
+        console.log(`Temperatura al chequear: ${temperatura}°C`);
+       
         broadcast({
             estado: estadoActual,
-            vida: vidaActual
+            vida: vidaActual,
+            temperatura
         });
     } else if (estadoActual === 'Ideal') {
         console.log('Estado ideal, la vida no disminuye.');
