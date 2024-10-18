@@ -88,6 +88,27 @@ app.post('/curar', (req, res) => {
     res.status(200).json({ message: `Vida incrementada a ${vidaActual}` });
 });
 
+app.post('/revivir', (req, res) => {
+    // Solo se puede revivir si el estado actual es "Muerto" y la vida está en 0
+    if (estadoActual !== 'Muerto' || vidaActual > 0) {
+        return res.status(400).json({ error: 'No se puede revivir porque el estado no es "Muerto".' });
+    }
+
+    // Restaurar la vida a 5 y cambiar el estado a "Ideal"
+    vidaActual = 5;
+    estadoActual = 'Ideal';
+
+    console.log('El sistema ha sido revivido. Vida restaurada a 5 y estado cambiado a "Ideal".');
+
+    // Enviar actualización a los clientes WebSocket
+    broadcast({
+        estado: estadoActual,
+        vida: vidaActual
+    });
+
+    res.status(200).json({ message: 'Sistema revivido con vida completa y estado "Ideal".' });
+});
+
 // Iniciar el servidor Express
 app.listen(port, () => {
     console.log(`Servidor Express escuchando en http://localhost:${port}`);
