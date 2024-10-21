@@ -173,6 +173,7 @@ client.on('message', async (topic, message) => {
             let nuevoEstado;
             if (temperatura > 40 || temperatura < 25) {
                 nuevoEstado = 'Muerto';
+                vidaActual= 0;
             } else if (temperatura >= rangosTemperatura.caluroso.min && temperatura <= rangosTemperatura.caluroso.max) {
                 nuevoEstado = 'Caluroso';
             } else if (temperatura >= rangosTemperatura.frio.min && temperatura <= rangosTemperatura.frio.max) {
