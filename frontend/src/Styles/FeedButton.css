@@ -1,17 +1,15 @@
-/* FeedButton.css */
-.btn-primary-curar{
-    margin-top: 20px;
-    background-color: #FCEE4A; /* Cambia el color de fondo al color "alimentar" */
-    border-color: #FCEE4A; /* Cambia también el borde */
-    color: black; /* Color del texto */
-    font-size: 1rem; /* Aumenta el tamaño de la fuente */
-    padding: 10px 20px; /* Aumenta el tamaño del botón */
-    border-radius: 8px; /* Ajusta el radio del borde para que el botón tenga bordes más suaves */
-    font-family: 'Press Start 2P';
-  }
-  
-  .btn-primary:hover {
-    background-color: #FCEE4A; /* Color al hacer hover, un poco más oscuro */
-    border-color: #FCEE4A;
-  }
-  
+.btn-primary-curar {
+  margin-top: 20px;
+  background-color: #FCEE4A; /* Cambia el color de fondo al color "alimentar" */
+  border-color: #FCEE4A; /* Cambia también el borde */
+  color: black; /* Color del texto */
+  font-size: 1rem; /* Aumenta el tamaño de la fuente */
+  padding: 10px 20px; /* Aumenta el tamaño del botón */
+  border-radius: 8px; /* Ajusta el radio del borde para que el botón tenga bordes más suaves */
+  font-family: 'Press Start 2P';
+}
+
+.btn-primary-curar:hover {
+  background-color: #fced4a9a; /* Color al hacer hover, un poco más oscuro */
+  border-color: #fced4a9a;
+}

@@ -1,17 +1,21 @@
-/* Content.css */
-
-.title {
-  width: 65%; /* Ajusta este valor según tus necesidades */
-  height: auto; /* Mantiene la relación de aspecto */
-  display: block; /* Asegura que no haya espacios debajo de la imagen */
-  margin: 0 auto; /* Centra la imagen dentro del contenedor */
-}
-
 .alien {
   width: 32vh;
   height: auto;
   display: block;
   margin: 35px auto;
+  transition: opacity 0.2s ease-in-out;
+  opacity: 1;
+}
+
+.alien.fade-out {
+  opacity: 0;
+}
+
+.title {
+  width: 65%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
 }
 
 .spinner-container {
@@ -21,7 +25,6 @@
   height: 100%;
 }
 
-/* Content.css */
 .login-message {
   position: absolute;
   left: 50%;
@@ -31,7 +34,6 @@
   margin-top: 15px;
   font-family: 'Press Start 2P', cursive;
   text-decoration: underline;
-
   animation: fadeInOut 3s infinite;
 }
 

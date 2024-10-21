@@ -1,16 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../Styles/Content.css";
 import { useAuth0 } from "@auth0/auth0-react";
 import Spinner from 'react-bootstrap/Spinner';
 import Datos from "./Datos";
 import FeedButton from "./FeedButton";
-import RevivirButton from "./RevivirButton"; 
+import RevivirButton from "./RevivirButton";
 
 const Content = () => {
   const { user, isAuthenticated, isLoading } = useAuth0();
-  const [estado, setEstado] = useState(''); // Añadimos un estado para controlar la imagen
-  
-  // Lógica para seleccionar la imagen basada en el estado
+  const [estado, setEstado] = useState('');
+  const [imagen, setImagen] = useState('/Images/alien-normal-big.gif');
+
+  useEffect(() => {
+    const img = document.getElementById('alien');
+    if (img) {
+        img.classList.add('fade-out');
+        setTimeout(() => {
+            setImagen(getImagen(estado));
+            img.classList.remove('fade-out');
+        }, 200); // Duración de la transición
+    }
+  }, [estado]);
+
   const getImagen = (estado) => {
     switch (estado) {
       case 'Muerto':
@@ -22,7 +33,7 @@ const Content = () => {
       case 'Ideal':
         return '/Images/alien-normal-big.gif';
       default:
-        return '/Images/alien-normal-big.gif'; 
+        return '/Images/alien-normal-big.gif';
     }
   };
 
@@ -36,14 +47,10 @@ const Content = () => {
         </div>
       ) : isAuthenticated ? (
         <div className="content">
-          {/* Pasamos el setEstado a Datos para que actualice el estado de la imagen */}
-          <Datos setEstado={setEstado}></Datos> 
-          {/* Renderizar la imagen dependiendo del estado */}
-          <img src={getImagen(estado)} alt="App Icon" className="alien" />
-          {/* Deshabilitar el botón de curar si el estado es 'Muerto' */}
-          <FeedButton disabled={estado === 'Muerto'}></FeedButton>
-          {/* Agregar el botón de revivir y deshabilitarlo si el estado es 'Ideal' o 'Muerto' */}
-          <RevivirButton disabled={estado !== 'Muerto'}></RevivirButton>
+          <Datos setEstado={setEstado}></Datos>
+          <img id="alien" src={imagen} alt="App Icon" className="alien" />
+          {estado !== 'Muerto' && <FeedButton></FeedButton>}
+          {estado === 'Muerto' && <RevivirButton></RevivirButton>}
         </div>
       ) : (
         <div className="content">
