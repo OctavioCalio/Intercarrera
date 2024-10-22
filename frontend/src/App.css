@@ -58,24 +58,23 @@ body {
   transition: background-color 0.5s ease; /* Transición suave para el color */
 }
 
-/* Clases para los diferentes estados con la opacidad */
 .content-box.muerto {
-  background-color: rgba(92, 105, 111, 0.25); /* Rojo claro */
+  background-color: rgba(92, 105, 111, 0.25); 
   border: 5px solid #5c696f;
 }
 
 .content-box.frio {
-  background-color: rgba(0, 150, 211, 0.25); /* Azul claro */
+  background-color: rgba(0, 150, 211, 0.25);
   border: 5px solid #0096d3;
 }
 
 .content-box.caluroso {
-  background-color: rgba(255, 83, 58, 0.25); /* Naranja claro */
+  background-color: rgba(255, 83, 58, 0.25);
   border: 5px solid #ff533a;
 }
 
 .content-box.ideal {
-  background-color: rgba(147, 253, 98, 0.25); /* Verde claro */
+  background-color: rgba(147, 253, 98, 0.25); 
   border: 5px solid #82e157;
 }
 
@@ -84,7 +83,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* Para centrar el spinner verticalmente */
+  height: 100vh; 
 }
 
 .title {
@@ -94,5 +93,5 @@ body {
 .login-message {
   margin-top: 10px;
   font-size: 1.5em;
-  color: white; /* Cambia el color según sea necesario */
+  color: white; 
 }

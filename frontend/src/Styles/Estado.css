@@ -12,6 +12,7 @@
   margin-bottom: 5px; /* Añadido margen inferior para espaciar el título del valor */
   text-transform: uppercase; /* Convertir el texto a mayúsculas */
   letter-spacing: 1px; /* Espaciado entre letras */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .estado-value {    

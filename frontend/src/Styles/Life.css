@@ -1,28 +1,36 @@
 /* src/Styles/LifeComponent.css */
 .life-container {
-    display: flex;
-    flex-direction: column; /* Cambia la dirección del flex a columna para poner el texto arriba */
-    align-items: flex-start; /* Alinea el contenido a la izquierda */
-  }
-  
-  .life-title {
-    margin-left: 5px;
-    font-size: 15px;
-    color: #FCEE4A;
-    font-family: 'Press Start 2P';
-  }
-  
-  .heart-images {
-    margin-left: 5px;
-    display: flex;
-    justify-content: flex-start; /* Asegura que las imágenes estén alineadas a la izquierda */
-  }
-  
-  .heart-image {
-    width: 40px; /* Tamaño de las imágenes de corazón */
-    height: auto;
-    margin-right: 5px; /* Espaciado entre los corazones */
-  }
-  
-  .heart-image.active {opacity: 1;}
-  .heart-image.inactive {opacity: 0.3;}
+  display: flex;
+  flex-direction: column; /* Cambia la dirección del flex a columna para poner el texto arriba */
+  align-items: flex-start; /* Alinea el contenido a la izquierda */
+}
+
+.life-title {
+  margin-left: 5px;
+  font-size: 15px;
+  color: #FCEE4A;
+  font-family: 'Press Start 2P';
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.heart-images {
+  margin-left: 5px;
+  display: flex;
+  justify-content: flex-start; /* Asegura que las imágenes estén alineadas a la izquierda */
+}
+
+.heart-image {
+  width: 40px; /* Tamaño de las imágenes de corazón */
+  height: auto;
+  margin-right: 5px; /* Espaciado entre los corazones */
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5)); /* Sombra para las imágenes de los corazones */
+  transition: opacity 0.3s ease; /* Añade una transición de opacidad */
+}
+
+.heart-image.active {
+  opacity: 1;
+}
+
+.heart-image.inactive {
+  opacity: 0.3;
+}

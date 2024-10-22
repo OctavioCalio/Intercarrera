@@ -9,6 +9,7 @@
     font-size: 20px;
     color: #FCEE4A;
     font-family: 'Press Start 2P';
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   }
   
   .Temperatura-value {    
@@ -17,4 +18,5 @@
     color: #ffffff;
     font-family: 'Press Start 2P';
     margin-bottom: 5px; 
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   }
