@@ -1,3 +1,10 @@
+/* App.css */
+body {
+  margin: 0;
+  padding: 0;  
+  background: url('../public/Images/fondo-estrellas.gif') repeat;
+}
+
 .App {
   text-align: center;
 }
@@ -37,13 +44,7 @@
   }
 }
 
-/* App.css */
-body {
-  margin: 0;
-  padding: 0;  
-  background: url('../public/Images/fondo-estrellas.gif') repeat;
-}
-
+/* Estilo base para el content-box */
 .content-box {
   background-color: rgba(252, 237, 74, 0.11);
   border: 5px solid #FCEE4A; /* Borde gris claro */
@@ -54,4 +55,44 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra para darle profundidad */
   margin-top: 5%;
   height: 65vh;
+  transition: background-color 0.5s ease; /* Transición suave para el color */
+}
+
+/* Clases para los diferentes estados con la opacidad */
+.content-box.muerto {
+  background-color: rgba(92, 105, 111, 0.25); /* Rojo claro */
+  border: 5px solid #5c696f;
+}
+
+.content-box.frio {
+  background-color: rgba(0, 150, 211, 0.25); /* Azul claro */
+  border: 5px solid #0096d3;
+}
+
+.content-box.caluroso {
+  background-color: rgba(255, 83, 58, 0.25); /* Naranja claro */
+  border: 5px solid #ff533a;
+}
+
+.content-box.ideal {
+  background-color: rgba(147, 253, 98, 0.25); /* Verde claro */
+  border: 5px solid #82e157;
+}
+
+/* Otras clases */
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Para centrar el spinner verticalmente */
+}
+
+.title {
+  margin-top: 20px;
+}
+
+.login-message {
+  margin-top: 10px;
+  font-size: 1.5em;
+  color: white; /* Cambia el color según sea necesario */
 }

@@ -6,7 +6,7 @@ import Datos from "./Datos";
 import FeedButton from "./FeedButton";
 import RevivirButton from "./RevivirButton";
 
-const Content = () => {
+const Content = ({ setEstadoAlien }) => {
   const { user, isAuthenticated, isLoading } = useAuth0();
   const [estado, setEstado] = useState('');
   const [imagen, setImagen] = useState('/Images/alien-normal-big.gif');
@@ -20,7 +20,11 @@ const Content = () => {
             img.classList.remove('fade-out');
         }, 200); // Duración de la transición
     }
-  }, [estado]);
+
+    // Actualiza el estado del alien en el componente App
+    setEstadoAlien(estado);
+
+  }, [estado, setEstadoAlien]);
 
   const getImagen = (estado) => {
     switch (estado) {
