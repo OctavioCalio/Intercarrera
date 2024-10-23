@@ -37,8 +37,8 @@ const client = mqtt.connect('mqtt://broker.hivemq.com');
 
 const rangosTemperatura = {
     ideal: { min: 32, max: 34 },
-    caluroso: { min: 34, max: 40 },
-    frio: { min: 25, max: 32 },
+    caluroso: { min: 35, max: 40 },
+    frio: { min: 25, max: 31 },
 };
 
 // Crear el servidor WebSocket
@@ -48,7 +48,6 @@ const wss = new WebSocket.Server({ port: 8080 });
 let estadoActual = null;
 let vidaActual = 5; // Vida inicial
 let intervaloVida = null;
-let temperaturaActual = null;
 
 // Función para enviar datos a todos los clientes conectados por WebSocket
 function broadcast(data) {
@@ -59,17 +58,6 @@ function broadcast(data) {
         }
     });
 }
-
-function actualizarTemperatura(nuevaTemperatura) {
-    temperaturaActual = nuevaTemperatura;
-    console.log(`Temperatura actualizada a: ${temperaturaActual}°C`);
-}
-
-
-function obtenerTemperatura() {
-    return temperaturaActual;
-}
-
 
 // WebSocket: Conexión inicial
 wss.on('connection', (ws) => {
@@ -92,13 +80,9 @@ app.post('/curar', (req, res) => {
     vidaActual = Math.min(5, vidaActual + vida); // Incrementar vida actual sin exceder 5
     console.log(`Vida incrementada a: ${vidaActual}`);
 
-    const temperatura = obtenerTemperatura(); // Obtener la temperatura actual
-    console.log(`Temperatura al curar: ${temperatura}°C`);
-
     broadcast({
         estado: estadoActual,
-        vida: vidaActual,
-        temperatura
+        vida: vidaActual
     });
 
     res.status(200).json({ message: `Vida incrementada a ${vidaActual}` });
@@ -116,15 +100,10 @@ app.post('/revivir', (req, res) => {
 
     console.log('El sistema ha sido revivido. Vida restaurada a 5 y estado cambiado a "Ideal".');
 
-    const temperatura = obtenerTemperatura(); // Obtener la temperatura actual
-    console.log(`Temperatura al revivir: ${temperatura}°C`);
-
-
     // Enviar actualización a los clientes WebSocket
     broadcast({
         estado: estadoActual,
-        vida: vidaActual,
-        temperatura
+        vida: vidaActual
     });
 
     res.status(200).json({ message: 'Sistema revivido con vida completa y estado "Ideal".' });
@@ -135,7 +114,7 @@ app.listen(port, () => {
     console.log(`Servidor Express escuchando en http://localhost:${port}`);
 });
 
-// Conexiones MQTT
+/// Conexiones MQTT
 client.on('connect', () => {
     console.log('Conectado al broker MQTT');
 
@@ -147,10 +126,6 @@ client.on('connect', () => {
 });
 
 // Manejar los mensajes de MQTT
-
-
-
-
 client.on('message', async (topic, message) => {
     if (topic === 'ete') {
         const msgString = message.toString().trim();
@@ -167,13 +142,9 @@ client.on('message', async (topic, message) => {
 
             console.log(`Temperatura recibida: ${temperatura}°C, Humedad recibida: ${humedad}%`);
 
-  
-            
-
             let nuevoEstado;
             if (temperatura > 40 || temperatura < 25) {
                 nuevoEstado = 'Muerto';
-                vidaActual= 0;
             } else if (temperatura >= rangosTemperatura.caluroso.min && temperatura <= rangosTemperatura.caluroso.max) {
                 nuevoEstado = 'Caluroso';
             } else if (temperatura >= rangosTemperatura.frio.min && temperatura <= rangosTemperatura.frio.max) {
@@ -189,6 +160,19 @@ client.on('message', async (topic, message) => {
                 intervaloVida = setInterval(chequearVida, 10000); // Chequear vida cada 10 segundos
             }
 
+            // Crear mensaje JSON para publicar
+            const mensajeEstado = {
+                temperatura: temperatura,
+                humedad: humedad,
+                vida: vidaActual,
+                estado: estadoActual
+            };
+
+            // Publicar el JSON en el tópico 'estado'
+            console.log(`Publicando mensaje en el tópico estado: ${JSON.stringify(mensajeEstado)}`);
+            client.publish('estado', JSON.stringify(mensajeEstado));  // Publica el JSON correctamente
+
+            // Enviar actualización a los clientes WebSocket
             broadcast({
                 temperatura,
                 humedad,
@@ -196,18 +180,10 @@ client.on('message', async (topic, message) => {
                 vida: vidaActual
             });
 
-            client.publish('estado', `El estado es: ${estadoActual}`);
-            console.log(`Estado publicado en MQTT: ${estadoActual}`);
-
+            // Guardar los datos en la base de datos
             const nuevaTemperatura = new Temperatura({ valor: temperatura, humedad, estado: estadoActual });
             await nuevaTemperatura.save();
             console.log(`Temperatura ${temperatura}°C y Humedad ${humedad}% almacenadas en la base de datos con estado '${estadoActual}'`);
-
-
-            actualizarTemperatura(temperatura);
-            console.log('Temperatura actualizada en constante a: ' + temperatura);	
-
-            
 
         } catch (error) {
             console.error(`Error al parsear el mensaje: ${msgString}`, error);
@@ -215,6 +191,7 @@ client.on('message', async (topic, message) => {
     }
 });
 
+// Función para chequear la vida
 function chequearVida() {
     if (estadoActual === 'Caluroso' || estadoActual === 'Frío') {
         vidaActual--;
@@ -225,14 +202,9 @@ function chequearVida() {
             clearInterval(intervaloVida);
             console.log('Estado actual: Muerto');
         }
-       
-        const temperatura = obtenerTemperatura(); // Obtener la temperatura actual
-        console.log(`Temperatura al chequear: ${temperatura}°C`);
-       
         broadcast({
             estado: estadoActual,
-            vida: vidaActual,
-            temperatura
+            vida: vidaActual
         });
     } else if (estadoActual === 'Ideal') {
         console.log('Estado ideal, la vida no disminuye.');
