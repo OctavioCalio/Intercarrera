@@ -157,7 +157,7 @@ client.on('message', async (topic, message) => {
             const data = JSON.parse(msgString);
             const temperatura = parseFloat(data.temperatura);
             const humedad = parseFloat(data.humedad);
-            const idr = parseInt(data.idr);  
+            const idr = parseInt(data.idr);  // Estado de la luz: 1 (encendida) o 0 (apagada)
 
             if (isNaN(temperatura) || isNaN(humedad) || isNaN(idr)) {
                 console.error(`Mensaje recibido no es válido: '${msgString}'`);
@@ -180,26 +180,35 @@ client.on('message', async (topic, message) => {
             // Actualizamos el estado si cambia
             if (nuevoEstado !== estadoActual) {
                 estadoActual = nuevoEstado;
-                clearInterval(intervaloVida); 
+                clearInterval(intervaloVida); // Reiniciar el intervalo si el estado cambia
                 intervaloVida = setInterval(chequearVida, 10000); 
             }
 
             // Publicar el estado de la luz basado en idr
             const estadoLuz = idr === 1 ? 'Luz encendida' : 'Luz apagada';
 
-            broadcast({
+            // Preparar el JSON con todos los datos
+            const jsonData = {
                 temperatura,
                 humedad,
                 estado: estadoActual,
                 vida: vidaActual,
                 idr,  
+                estadoLuz,
+                fecha: new Date().toISOString() 
+            };
+
+            // Publicar el JSON completo en el tema 'estado'
+            client.publish('estado', JSON.stringify(jsonData));
+            console.log('JSON publicado en MQTT en el tema "estado":', jsonData);
+
+            // Guardar los datos en la base de datos
+            const nuevaTemperatura = new Temperatura({ 
+                valor: temperatura, 
+                humedad, 
+                estado: estadoActual, 
+                idr 
             });
-
-            client.publish('estado', `El estado es: ${estadoActual}, ${estadoLuz}`);
-            console.log(`Estado publicado en MQTT: ${estadoActual}, ${estadoLuz}`);
-
-            // Guardar en la base de datos
-            const nuevaTemperatura = new Temperatura({ valor: temperatura, humedad, estado: estadoActual, idr });
             await nuevaTemperatura.save();
             console.log(`Temperatura ${temperatura}°C, Humedad ${humedad}% e IDR ${idr} almacenados en la base de datos con estado '${estadoActual}'`);
 
@@ -208,6 +217,7 @@ client.on('message', async (topic, message) => {
         }
     }
 });
+
 
 function chequearVida() {
     if (estadoActual === 'Caluroso' || estadoActual === 'Frío') {
