@@ -24,11 +24,11 @@ mongoose.connect('mongodb+srv://rabbiafacundo:FACUNDO@cluster0.yy82i.mongodb.net
 
 // Definir el esquema y modelo
 const temperaturaSchema = new mongoose.Schema({
-    valor: { type: Number, required: true }, // Temperatura
-    humedad: { type: Number, required: true }, // Humedad
+    valor: { type: Number, required: true }, 
+    humedad: { type: Number, required: true }, 
     estado: { type: String, required: true },
-    idr: { type: Number, required: true }, // Nuevo campo para la luz (0 = apagada, 1 = encendida)
-    fecha: { type: Date, default: Date.now }  // Timestamp por defecto
+    idr: { type: Number, required: true }, 
+    fecha: { type: Date, default: Date.now }  
 });
 
 const Temperatura = mongoose.model('Temperatura', temperaturaSchema);
@@ -47,7 +47,7 @@ const wss = new WebSocket.Server({ port: 8080 });
 
 // Variables de estado
 let estadoActual = null;
-let vidaActual = 5; // Vida inicial
+let vidaActual = 5; 
 let intervaloVida = null;
 
 // Función para enviar datos a todos los clientes conectados por WebSocket
@@ -71,14 +71,14 @@ wss.on('connection', (ws) => {
 
 // Nueva ruta para incrementar la vida
 app.post('/curar', (req, res) => {
-    const { vida } = req.body; // Extraer la vida del cuerpo de la solicitud
+    const { vida } = req.body; 
 
-    // Validar que la vida es un número y está en un rango válido
+   
     if (typeof vida !== 'number' || vida <= 0) {
         return res.status(400).json({ error: 'Cantidad de vida no válida.' });
     }
 
-    vidaActual = Math.min(5, vidaActual + vida); // Incrementar vida actual sin exceder 5
+    vidaActual = Math.min(5, vidaActual + vida); 
     console.log(`Vida incrementada a: ${vidaActual}`);
 
     broadcast({
@@ -157,7 +157,7 @@ client.on('message', async (topic, message) => {
             const data = JSON.parse(msgString);
             const temperatura = parseFloat(data.temperatura);
             const humedad = parseFloat(data.humedad);
-            const idr = parseInt(data.idr);  // Estado de la luz: 1 (encendida) o 0 (apagada)
+            const idr = parseInt(data.idr);  
 
             if (isNaN(temperatura) || isNaN(humedad) || isNaN(idr)) {
                 console.error(`Mensaje recibido no es válido: '${msgString}'`);
@@ -180,14 +180,14 @@ client.on('message', async (topic, message) => {
             // Actualizamos el estado si cambia
             if (nuevoEstado !== estadoActual) {
                 estadoActual = nuevoEstado;
-                clearInterval(intervaloVida); // Reiniciar el intervalo si el estado cambia
+                clearInterval(intervaloVida); 
                 intervaloVida = setInterval(chequearVida, 10000); 
             }
 
-            // Publicar el estado de la luz basado en idr
+           
             const estadoLuz = idr === 1 ? 'Luz encendida' : 'Luz apagada';
 
-            // Preparar el JSON con todos los datos
+            
             const jsonData = {
                 temperatura,
                 humedad,
@@ -198,7 +198,7 @@ client.on('message', async (topic, message) => {
                 fecha: new Date().toISOString() 
             };
 
-            // Publicar el JSON completo en el tema 'estado'
+            
             client.publish('estado', JSON.stringify(jsonData));
             console.log('JSON publicado en MQTT en el tema "estado":', jsonData);
 
