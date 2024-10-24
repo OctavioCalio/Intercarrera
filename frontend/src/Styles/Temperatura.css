@@ -1,22 +1,22 @@
 .temperatura-container {
-    display: flex;
-    flex-direction: column; /* Cambia la dirección del flex a columna para poner el texto arriba */
-    align-items: center; /* Alinea el contenido a la izquierda */
-    margin-right: 40px;
-  }
-  
-  .Temperatura-title {
-    font-size: 20px;
-    color: #FCEE4A;
-    font-family: 'Press Start 2P';
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  }
-  
-  .Temperatura-value {    
-    text-align: center;
-    font-size: 35px;
-    color: #ffffff;
-    font-family: 'Press Start 2P';
-    margin-bottom: 5px; 
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 2vw; /* Margen dinámico para ajustarse al ancho de la pantalla */
+}
+
+.Temperatura-title {
+  font-size: 1.2vw; /* Tamaño del texto basado en el ancho de la pantalla */
+  color: #FCEE4A;
+  font-family: 'Press Start 2P';
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.Temperatura-value {
+  text-align: center;
+  font-size: 1.7vw; /* Tamaño dinámico del valor de la temperatura */
+  color: #ffffff;
+  font-family: 'Press Start 2P';
+  margin-bottom: 1vw; /* Margen inferior dinámico */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}

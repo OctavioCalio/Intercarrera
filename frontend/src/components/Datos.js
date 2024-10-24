@@ -5,7 +5,7 @@ import Estado from "./Estado";
 import { useState, useEffect } from 'react';
 
 const Datos = ({ setEstado }) => {
-  const [estado, actualizarEstado] = useState('Esperando...');
+  const [estado, actualizarEstado] = useState('Esperando');
   const [temperatura, setTemperatura] = useState('...');
   const [vidaActual, setVidaActual] = useState();
 

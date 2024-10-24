@@ -1,12 +1,6 @@
 import React from 'react';
-import '../Styles/Life.css'; // Asegúrate de crear este archivo CSS
+import '../Styles/Life.css'; 
 import { useState, useEffect } from 'react';
-
-
-
-
-
-
 
 const Life = ({vidaActual}) => {
 

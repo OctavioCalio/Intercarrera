@@ -1,27 +1,28 @@
 .estado-container {
   display: flex;
-  flex-direction: column; /* Mantiene la dirección en columna */
-  align-items: flex-end; /* Cambiado a alinear a la derecha */
-  margin-right: 20px; /* Añadido margen a la derecha para separar del borde */
+  flex-direction: column;
+  align-items: flex-end;
+  margin-right: 1vw; /* Margen dinámico para ajustarse al tamaño de la pantalla */
 }
 
 .estado-title {
-  font-size: 15px;
-  color: #FCEE4A; /* Amarillo */
+  font-size: 1.2vw; /* Tamaño de fuente dinámico basado en el ancho de la pantalla */
+  color: #FCEE4A;
   font-family: 'Press Start 2P', cursive;
-  margin-bottom: 5px; /* Añadido margen inferior para espaciar el título del valor */
-  text-transform: uppercase; /* Convertir el texto a mayúsculas */
-  letter-spacing: 1px; /* Espaciado entre letras */
+  margin-bottom: 0.2vw; /* Margen inferior dinámico */
+  letter-spacing: 0.1vw; /* Espaciado entre letras dinámico */
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .estado-value {    
-  font-size: 25px;
-  color: #8EE367; /* Verde claro */
+  font-size: 1.3vw; /* Tamaño de fuente dinámico basado en el ancho de la pantalla */
+  text-transform: uppercase;
+  color: #8EE367;
   font-family: 'Press Start 2P', cursive;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Sombra en el texto para más contraste */
-  letter-spacing: 2px; /* Aumentar el espaciado entre letras */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.2vw; /* Espaciado entre letras dinámico */
 }
+
 .estado-container {
   text-align: center;
 }

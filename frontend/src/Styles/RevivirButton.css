@@ -1,16 +1,31 @@
 /* Estilos para el botón de revivir */
 .btn-primary-revivir {
-    margin-top: 20px;
-    background-color: #4CAF50; /* Cambia el color de fondo para el botón de revivir */
-    border-color: #4CAF50; /* Cambia también el borde */
-    color: white; /* Color del texto */
-    font-size: 1rem; /* Aumenta el tamaño de la fuente */
-    padding: 10px 20px; /* Aumenta el tamaño del botón */
-    border-radius: 8px; /* Ajusta el radio del borde para que el botón tenga bordes más suaves */
-    font-family: 'Press Start 2P';
-  }
-  
-  .btn-primary-revivir:hover {
-    background-color: #45a049; /* Color al hacer hover para el botón de revivir */
-    border-color: #45a049;
-  }
+  margin-top: 2vw; /* Margen superior en vw */
+  background-color: #4CAF50; /* Color de fondo para el botón de revivir */
+  border-color: #4CAF50; /* Color del borde */
+  color: white; /* Color del texto */
+  font-size: 1vw; /* Tamaño de fuente basado en el ancho de la ventana */
+  padding: 1vh 0; /* Padding vertical usando unidades relativas al alto de la ventana */
+  border-radius: 8px; /* Bordes suaves */
+  font-family: 'Press Start 2P';
+  transition: background-color 0.3s ease, border-color 0.3s ease; /* Transiciones suaves */
+  width: 80%; /* Ancho del botón en porcentaje */
+  max-width: 150px; /* Ancho máximo para evitar que crezca demasiado */
+  min-width: 75px; /* Ancho mínimo para asegurarse de que no se vuelva demasiado pequeño */
+  height: 6vh; /* Alto del botón en unidades relativas a la altura de la ventana */
+  display: block; /* Asegura que el botón se comporte como un bloque */
+  margin-left: auto; /* Centrando el botón horizontalmente */
+  margin-right: auto; /* Centrando el botón horizontalmente */
+}
+
+.btn-primary-revivir:hover {
+  background-color: #45a049; /* Color al hacer hover para el botón de revivir */
+  border-color: #45a049;
+}
+
+.mensaje {
+  margin-top: 10px; /* Espacio entre el botón y el mensaje */
+  font-size: 2vw; /* Tamaño relativo para el mensaje */
+  color: #FCEE4A; /* Color del mensaje */
+  text-align: center; /* Centra el texto */
+}

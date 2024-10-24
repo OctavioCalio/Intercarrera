@@ -1,8 +1,14 @@
+.content {
+  flex-direction: column; /* Mantiene la dirección en columna */
+  align-items: center; /* Centra los elementos horizontalmente */
+  padding: 10px; /* Espaciado interno */
+}
+
 .alien {
-  width: 32vh;
+  width: 15vw; /* Usa una unidad relativa para el ancho */
   height: auto;
   display: block;
-  margin: 35px auto;
+  margin: 20px auto; /* Espaciado vertical */
   transition: opacity 0.2s ease-in-out;
   opacity: 1;
 }
@@ -12,7 +18,8 @@
 }
 
 .title {
-  width: 65%;
+  width: 50%; /* Reduce el ancho para pantallas pequeñas */
+  max-width: 500px; /* Ancho máximo para evitar que crezca demasiado */
   height: auto;
   display: block;
   margin: 0 auto;
@@ -29,12 +36,12 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 25px;
+  font-size: 1.5vw; /* Usa una unidad relativa para el tamaño de fuente */
   color: #FCEE4A;
-  margin-top: 15px;
+  margin-top: 1.5vw;
   font-family: 'Press Start 2P', cursive;
-  text-decoration: underline;
   animation: fadeInOut 3s infinite;
+  text-align: center; /* Alinea el texto al centro */
 }
 
 @keyframes fadeInOut {
