@@ -48,6 +48,8 @@ const wss = new WebSocket.Server({ port: 8080 });
 let estadoActual = null;
 let vidaActual = 5; // Vida inicial
 let intervaloVida = null;
+let ultimaTemperatura = null; // Última temperatura conocida
+let ultimaHumedad = null;     // Última humedad conocida
 
 // Función para enviar datos a todos los clientes conectados por WebSocket
 function broadcast(data) {
@@ -81,6 +83,8 @@ app.post('/curar', (req, res) => {
     console.log(`Vida incrementada a: ${vidaActual}`);
 
     broadcast({
+        temperatura: ultimaTemperatura,
+        humedad: ultimaHumedad,
         estado: estadoActual,
         vida: vidaActual
     });
@@ -102,6 +106,8 @@ app.post('/revivir', (req, res) => {
 
     // Enviar actualización a los clientes WebSocket
     broadcast({
+        temperatura: ultimaTemperatura,
+        humedad: ultimaHumedad,
         estado: estadoActual,
         vida: vidaActual
     });
@@ -142,6 +148,10 @@ client.on('message', async (topic, message) => {
 
             console.log(`Temperatura recibida: ${temperatura}°C, Humedad recibida: ${humedad}%`);
 
+            // Guardar la última temperatura y humedad recibidas
+            ultimaTemperatura = temperatura;
+            ultimaHumedad = humedad;
+
             let nuevoEstado;
             if (temperatura > 40 || temperatura < 25) {
                 nuevoEstado = 'Muerto';
@@ -153,7 +163,7 @@ client.on('message', async (topic, message) => {
                 nuevoEstado = 'Ideal';
             }
 
-            // Actualizamos el estado si cambia
+            // Actualizar el estado si cambia
             if (nuevoEstado !== estadoActual) {
                 estadoActual = nuevoEstado;
                 clearInterval(intervaloVida); // Reiniciar el intervalo si el estado cambia
@@ -190,7 +200,11 @@ function chequearVida() {
             clearInterval(intervaloVida);
             console.log('Estado actual: Muerto');
         }
+
+        // Aquí enviamos siempre la temperatura y humedad junto con el estado y vida
         broadcast({
+            temperatura: ultimaTemperatura,
+            humedad: ultimaHumedad,
             estado: estadoActual,
             vida: vidaActual
         });
