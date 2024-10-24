@@ -30,7 +30,7 @@ const Content = ({ setEstadoAlien }) => {
     switch (estado) {
       case 'Muerto':
         return '/Images/alien-muerto-big.gif';
-      case 'Frío':
+      case 'Frio':
         return '/Images/alien-frio-big.gif';
       case 'Caluroso':
         return '/Images/alien-calor-big.gif';

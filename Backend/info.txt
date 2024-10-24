@@ -24,7 +24,7 @@ const Temperatura = mongoose.model('Temperatura', temperaturaSchema);
 const client = mqtt.connect('mqtt://test.mosquitto.org');
 
 // Umbrales de temperatura
-const THRESHOLD_COLD = 15;  // Menor o igual a 15°C = Frío
+const THRESHOLD_COLD = 15;  // Menor o igual a 15°C = Frio
 const THRESHOLD_HOT = 30;   // Mayor o igual a 30°C = Caluroso
 
 client.on('connect', () => {

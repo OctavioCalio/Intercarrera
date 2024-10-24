@@ -36,9 +36,9 @@ const Temperatura = mongoose.model('Temperatura', temperaturaSchema);
 const client = mqtt.connect('mqtt://broker.hivemq.com');
 
 const rangosTemperatura = {
-    ideal: { min: 32, max: 34 },
-    caluroso: { min: 34, max: 40 },
-    frio: { min: 25, max: 32 },
+    ideal: { min: 25, max: 27 },
+    caluroso: { min: 28, max: 40 },
+    frio: { min: 15, max: 24 },
 };
 
 // Crear el servidor WebSocket
@@ -153,7 +153,7 @@ client.on('message', async (topic, message) => {
             ultimaHumedad = humedad;
 
             let nuevoEstado;
-            if (temperatura > 40 || temperatura < 25) {
+            if (temperatura > 40 || temperatura < 15) {
                 nuevoEstado = 'Muerto';
                 vidaActual= 0;
             } else if (temperatura >= rangosTemperatura.caluroso.min && temperatura <= rangosTemperatura.caluroso.max) {
@@ -178,8 +178,15 @@ client.on('message', async (topic, message) => {
                 vida: vidaActual
             });
 
-            client.publish('estado', `El estado es: ${estadoActual}`);
-            console.log(`Estado publicado en MQTT: ${estadoActual}`);
+            
+
+            client.publish('estado', JSON.stringify({
+                temperatura: ultimaTemperatura,
+                humedad: ultimaHumedad,
+                vida: vidaActual,
+                estado: estadoActual
+            }));
+            
 
             const nuevaTemperatura = new Temperatura({ valor: temperatura, humedad, estado: estadoActual });
             await nuevaTemperatura.save();

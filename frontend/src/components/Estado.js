@@ -10,7 +10,7 @@ const Estado = ({ estado, vidaActual }) => {
     switch (estado) {
       case 'Ideal':
         return 'estado-ideal';
-      case 'Frío':
+      case 'Frio':
         return 'estado-frio';
       case 'Caluroso':
         return 'estado-caliente';
@@ -18,6 +18,7 @@ const Estado = ({ estado, vidaActual }) => {
         return '';
     }
   };
+  console.log(estado);
 
   // Definir el estado mostrado basado en la vida
   const mostrarEstado = vidaActual === 0 ? 'Muerto' : estado;

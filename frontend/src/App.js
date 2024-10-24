@@ -11,7 +11,7 @@ function App() {
     switch (estado) {
       case 'Muerto':
         return 'content-box muerto';
-      case 'Frío':
+      case 'Frio':
         return 'content-box frio';
       case 'Caluroso':
         return 'content-box caluroso';
