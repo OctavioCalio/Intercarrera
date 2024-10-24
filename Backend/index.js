@@ -37,8 +37,8 @@ const Temperatura = mongoose.model('Temperatura', temperaturaSchema);
 const client = mqtt.connect('mqtt://broker.hivemq.com');
 
 const rangosTemperatura = {
-    ideal: { min: 32, max: 34 },
-    caluroso: { min: 34, max: 40 },
+    ideal: { min: 33, max: 34 },
+    caluroso: { min: 35, max: 40 },
     frio: { min: 25, max: 32 },
 };
 
