@@ -27,6 +27,7 @@ const temperaturaSchema = new mongoose.Schema({
     valor: { type: Number, required: true }, // Temperatura
     humedad: { type: Number, required: true }, // Humedad
     estado: { type: String, required: true },
+    idr: { type: Number, required: true }, // Nuevo campo para la luz (0 = apagada, 1 = encendida)
     fecha: { type: Date, default: Date.now }  // Timestamp por defecto
 });
 
@@ -37,8 +38,8 @@ const client = mqtt.connect('mqtt://broker.hivemq.com');
 
 const rangosTemperatura = {
     ideal: { min: 32, max: 34 },
-    caluroso: { min: 35, max: 40 },
-    frio: { min: 25, max: 31 },
+    caluroso: { min: 34, max: 40 },
+    frio: { min: 25, max: 32 },
 };
 
 // Crear el servidor WebSocket
@@ -88,8 +89,9 @@ app.post('/curar', (req, res) => {
     res.status(200).json({ message: `Vida incrementada a ${vidaActual}` });
 });
 
+// Ruta para revivir el sistema si está en estado "Muerto"
 app.post('/revivir', (req, res) => {
-    // Solo se puede revivir si el estado actual es "Muerto" y la vida está en 0
+   
     if (estadoActual !== 'Muerto' || vidaActual > 0) {
         return res.status(400).json({ error: 'No se puede revivir porque el estado no es "Muerto".' });
     }
@@ -109,12 +111,33 @@ app.post('/revivir', (req, res) => {
     res.status(200).json({ message: 'Sistema revivido con vida completa y estado "Ideal".' });
 });
 
+// Ruta para actualizar el estado de la luz
+app.post('/luz', (req, res) => {
+    const { idr } = req.body; 
+    if (typeof idr !== 'number' || (idr !== 0 && idr !== 1)) {
+        return res.status(400).json({ error: 'Estado de luz no válido.' });
+    }
+
+    const estadoLuz = idr === 1 ? 'Luz encendida' : 'Luz apagada';
+    broadcast({
+        estado: estadoActual,
+        vida: vidaActual,
+        idr,
+        estadoLuz
+    });
+
+    client.publish('estadoLuz', estadoLuz);
+    console.log(`Estado de la luz actualizado: ${estadoLuz}`);
+
+    res.status(200).json({ message: `Estado de la luz actualizado: ${estadoLuz}` });
+});
+
 // Iniciar el servidor Express
 app.listen(port, () => {
     console.log(`Servidor Express escuchando en http://localhost:${port}`);
 });
 
-/// Conexiones MQTT
+// Conexiones MQTT
 client.on('connect', () => {
     console.log('Conectado al broker MQTT');
 
@@ -134,13 +157,14 @@ client.on('message', async (topic, message) => {
             const data = JSON.parse(msgString);
             const temperatura = parseFloat(data.temperatura);
             const humedad = parseFloat(data.humedad);
+            const idr = parseInt(data.idr);  
 
-            if (isNaN(temperatura) || isNaN(humedad)) {
-                console.error(`Mensaje recibido no es un número válido: '${msgString}'`);
+            if (isNaN(temperatura) || isNaN(humedad) || isNaN(idr)) {
+                console.error(`Mensaje recibido no es válido: '${msgString}'`);
                 return;
             }
 
-            console.log(`Temperatura recibida: ${temperatura}°C, Humedad recibida: ${humedad}%`);
+            console.log(`Temperatura recibida: ${temperatura}°C, Humedad recibida: ${humedad}%, IDR recibido: ${idr}`);
 
             let nuevoEstado;
             if (temperatura > 40 || temperatura < 25) {
@@ -156,34 +180,28 @@ client.on('message', async (topic, message) => {
             // Actualizamos el estado si cambia
             if (nuevoEstado !== estadoActual) {
                 estadoActual = nuevoEstado;
-                clearInterval(intervaloVida); // Reiniciar el intervalo si el estado cambia
-                intervaloVida = setInterval(chequearVida, 10000); // Chequear vida cada 10 segundos
+                clearInterval(intervaloVida); 
+                intervaloVida = setInterval(chequearVida, 10000); 
             }
 
-            // Crear mensaje JSON para publicar
-            const mensajeEstado = {
-                temperatura: temperatura,
-                humedad: humedad,
-                vida: vidaActual,
-                estado: estadoActual
-            };
+            // Publicar el estado de la luz basado en idr
+            const estadoLuz = idr === 1 ? 'Luz encendida' : 'Luz apagada';
 
-            // Publicar el JSON en el tópico 'estado'
-            console.log(`Publicando mensaje en el tópico estado: ${JSON.stringify(mensajeEstado)}`);
-            client.publish('estado', JSON.stringify(mensajeEstado));  // Publica el JSON correctamente
-
-            // Enviar actualización a los clientes WebSocket
             broadcast({
                 temperatura,
                 humedad,
                 estado: estadoActual,
-                vida: vidaActual
+                vida: vidaActual,
+                idr,  
             });
 
-            // Guardar los datos en la base de datos
-            const nuevaTemperatura = new Temperatura({ valor: temperatura, humedad, estado: estadoActual });
+            client.publish('estado', `El estado es: ${estadoActual}, ${estadoLuz}`);
+            console.log(`Estado publicado en MQTT: ${estadoActual}, ${estadoLuz}`);
+
+            // Guardar en la base de datos
+            const nuevaTemperatura = new Temperatura({ valor: temperatura, humedad, estado: estadoActual, idr });
             await nuevaTemperatura.save();
-            console.log(`Temperatura ${temperatura}°C y Humedad ${humedad}% almacenadas en la base de datos con estado '${estadoActual}'`);
+            console.log(`Temperatura ${temperatura}°C, Humedad ${humedad}% e IDR ${idr} almacenados en la base de datos con estado '${estadoActual}'`);
 
         } catch (error) {
             console.error(`Error al parsear el mensaje: ${msgString}`, error);
@@ -191,7 +209,6 @@ client.on('message', async (topic, message) => {
     }
 });
 
-// Función para chequear la vida
 function chequearVida() {
     if (estadoActual === 'Caluroso' || estadoActual === 'Frío') {
         vidaActual--;
