@@ -90,6 +90,16 @@ app.post('/curar', (req, res) => {
     });
 
     res.status(200).json({ message: `Vida incrementada a ${vidaActual}` });
+
+
+
+    client.publish('estado', JSON.stringify({
+        vida_aumentada_a: vidaActual,
+    }));
+
+
+
+
 });
 
 app.post('/revivir', (req, res) => {
@@ -113,6 +123,18 @@ app.post('/revivir', (req, res) => {
     });
 
     res.status(200).json({ message: 'Sistema revivido con vida completa y estado "Ideal".' });
+
+
+    client.publish('estado', JSON.stringify({
+        temperatura: 26,
+        humedad: ultimaHumedad,
+        vida: vidaActual,
+        estado: estadoActual
+    }));
+
+
+
+
 });
 
 // Iniciar el servidor Express
@@ -126,7 +148,7 @@ client.on('connect', () => {
 
     client.subscribe('ete', (err) => {
         if (!err) {
-            console.log('Suscrito al tema prueba');
+            console.log('Suscrito al tema ete');
         }
     });
 });
@@ -135,6 +157,19 @@ client.on('connect', () => {
 client.on('message', async (topic, message) => {
     if (topic === 'ete') {
         const msgString = message.toString().trim();
+
+        if (estadoActual === 'Muerto') {
+            console.log('E.T está muerto Elliott. No se puede actualizar la temperatura ni la humedad.');
+            client.publish('estado', JSON.stringify({
+
+                vida_disminuida_a: 0,
+                estado: "Muerto"
+
+            }));
+            return;
+        }
+
+
 
         try {
             const data = JSON.parse(msgString);
@@ -155,7 +190,7 @@ client.on('message', async (topic, message) => {
             let nuevoEstado;
             if (temperatura > 40 || temperatura < 15) {
                 nuevoEstado = 'Muerto';
-                vidaActual= 0;
+                vidaActual = 0;
             } else if (temperatura >= rangosTemperatura.caluroso.min && temperatura <= rangosTemperatura.caluroso.max) {
                 nuevoEstado = 'Caluroso';
             } else if (temperatura >= rangosTemperatura.frio.min && temperatura <= rangosTemperatura.frio.max) {
@@ -178,7 +213,7 @@ client.on('message', async (topic, message) => {
                 vida: vidaActual
             });
 
-            
+
 
             client.publish('estado', JSON.stringify({
                 temperatura: ultimaTemperatura,
@@ -186,7 +221,7 @@ client.on('message', async (topic, message) => {
                 vida: vidaActual,
                 estado: estadoActual
             }));
-            
+
 
             const nuevaTemperatura = new Temperatura({ valor: temperatura, humedad, estado: estadoActual });
             await nuevaTemperatura.save();
@@ -201,10 +236,22 @@ client.on('message', async (topic, message) => {
 function chequearVida() {
     if (estadoActual === 'Caluroso' || estadoActual === 'Frio') {
         vidaActual--;
+
+
+        client.publish('estado', JSON.stringify({
+            vida_disminuida_a: vidaActual,
+        }));
+
         console.log(`Vida disminuida a: ${vidaActual}`);
         if (vidaActual <= 0) {
             estadoActual = 'Muerto';
             vidaActual = 0;
+
+            client.publish('estado', JSON.stringify({
+                estado: estadoActual,
+            }));
+
+
             clearInterval(intervaloVida);
             console.log('Estado actual: Muerto');
         }
