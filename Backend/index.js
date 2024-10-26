@@ -91,15 +91,9 @@ app.post('/curar', (req, res) => {
 
     res.status(200).json({ message: `Vida incrementada a ${vidaActual}` });
 
-
-
     client.publish('estado', JSON.stringify({
         vida_aumentada_a: vidaActual,
     }));
-
-
-
-
 });
 
 app.post('/revivir', (req, res) => {
@@ -116,7 +110,7 @@ app.post('/revivir', (req, res) => {
 
     // Enviar actualización a los clientes WebSocket
     broadcast({
-        temperatura: ultimaTemperatura,
+        temperatura: 26,
         humedad: ultimaHumedad,
         estado: estadoActual,
         vida: vidaActual
@@ -126,15 +120,11 @@ app.post('/revivir', (req, res) => {
 
 
     client.publish('estado', JSON.stringify({
-        temperatura: 26,
-        humedad: ultimaHumedad,
+        temperatura: 26,      //Mando una temperatura hardcodeada por mqtt cuando lo revivimos
+        humedad: ultimaHumedad,  //La humedad sigue siendo la última capturada
         vida: vidaActual,
         estado: estadoActual
     }));
-
-
-
-
 });
 
 // Iniciar el servidor Express
@@ -168,9 +158,6 @@ client.on('message', async (topic, message) => {
             }));
             return;
         }
-
-
-
         try {
             const data = JSON.parse(msgString);
             const temperatura = parseFloat(data.temperatura);
@@ -213,15 +200,12 @@ client.on('message', async (topic, message) => {
                 vida: vidaActual
             });
 
-
-
             client.publish('estado', JSON.stringify({
                 temperatura: ultimaTemperatura,
                 humedad: ultimaHumedad,
                 vida: vidaActual,
                 estado: estadoActual
             }));
-
 
             const nuevaTemperatura = new Temperatura({ valor: temperatura, humedad, estado: estadoActual });
             await nuevaTemperatura.save();
