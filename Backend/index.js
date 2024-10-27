@@ -4,6 +4,7 @@ const mqtt = require('mqtt');
 const mongoose = require('mongoose');
 const WebSocket = require('ws');
 const cors = require('cors');
+const { clear } = require('console');
 
 // Configuración del servidor Express
 const app = express();
@@ -51,6 +52,10 @@ let intervaloVida = null;
 let ultimaTemperatura = null; // Última temperatura conocida
 let ultimaHumedad = null;     // Última humedad conocida
 
+let estaDespierto = true;
+
+
+
 // Función para enviar datos a todos los clientes conectados por WebSocket
 function broadcast(data) {
     console.log('Enviando datos a todos los clientes conectados: ', data);
@@ -80,18 +85,29 @@ app.post('/curar', (req, res) => {
     }
 
     vidaActual = Math.min(5, vidaActual + vida); // Incrementar vida actual sin exceder 5
-    console.log(`Vida incrementada a: ${vidaActual}`);
+   
+    clearInterval(intervaloVida); //Esto es para que el contador que chequea la vida se reinicie cuando lo curamos
+    if (estaDespierto) {
+        intervaloVida = setInterval(chequearVida, 10000);
+    } else {
+        intervaloVida = setInterval(chequearVida, 30000);
+    }
 
+    console.log(`Vida incrementada a: ${vidaActual}`);
+   
+   
     broadcast({
+   
         temperatura: ultimaTemperatura,
         humedad: ultimaHumedad,
         estado: estadoActual,
-        vida: vidaActual
+        vida: vidaActual,
+        despierto: estaDespierto
     });
 
     res.status(200).json({ message: `Vida incrementada a ${vidaActual}` });
 
-    client.publish('estado', JSON.stringify({
+    client.publish('2-Enviar', JSON.stringify({
         vida_aumentada_a: vidaActual,
     }));
 });
@@ -113,17 +129,19 @@ app.post('/revivir', (req, res) => {
         temperatura: 26,
         humedad: ultimaHumedad,
         estado: estadoActual,
-        vida: vidaActual
+        vida: vidaActual,
+        despierto: estaDespierto
     });
 
     res.status(200).json({ message: 'Sistema revivido con vida completa y estado "Ideal".' });
 
 
-    client.publish('estado', JSON.stringify({
+    client.publish('2-Enviar', JSON.stringify({
         temperatura: 26,      //Mando una temperatura hardcodeada por mqtt cuando lo revivimos
         humedad: ultimaHumedad,  //La humedad sigue siendo la última capturada
         vida: vidaActual,
-        estado: estadoActual
+        estado: estadoActual,
+        despierto: estaDespierto
     }));
 });
 
@@ -136,16 +154,16 @@ app.listen(port, () => {
 client.on('connect', () => {
     console.log('Conectado al broker MQTT');
 
-    client.subscribe('ete', (err) => {
+    client.subscribe('1-Recibir', (err) => {
         if (!err) {
-            console.log('Suscrito al tema ete');
+            console.log('Suscrito al tema 1-Recibir');
         }
     });
 });
 
 // Manejar los mensajes de MQTT
 client.on('message', async (topic, message) => {
-    if (topic === 'ete') {
+    if (topic === '1-Recibir') {
         const msgString = message.toString().trim();
 
         if (estadoActual === 'Muerto') {
@@ -162,18 +180,21 @@ client.on('message', async (topic, message) => {
             const data = JSON.parse(msgString);
             const temperatura = parseFloat(data.temperatura);
             const humedad = parseFloat(data.humedad);
+            const luz = parseInt(data.luz) === 1; //pasa a booleano
 
             if (isNaN(temperatura) || isNaN(humedad)) {
                 console.error(`Mensaje recibido no es un número válido: '${msgString}'`);
                 return;
             }
 
-            console.log(`Temperatura recibida: ${temperatura}°C, Humedad recibida: ${humedad}%`);
+            console.log(`Temperatura recibida: ${temperatura}°C, Humedad recibida: ${humedad}%, Luz recibida: ${luz}`);
 
             // Guardar la última temperatura y humedad recibidas
             ultimaTemperatura = temperatura;
             ultimaHumedad = humedad;
-
+            estaDespierto = luz;
+            console.log('estaDespierto: ', estaDespierto);
+            
             let nuevoEstado;
             if (temperatura > 40 || temperatura < 15) {
                 nuevoEstado = 'Muerto';
@@ -186,25 +207,46 @@ client.on('message', async (topic, message) => {
                 nuevoEstado = 'Ideal';
             }
 
-            // Actualizar el estado si cambia
+            // Actualizar el estado
             if (nuevoEstado !== estadoActual) {
                 estadoActual = nuevoEstado;
-                clearInterval(intervaloVida); // Reiniciar el intervalo si el estado cambia
-                intervaloVida = setInterval(chequearVida, 10000); // Chequear vida cada 10 segundos
             }
+            
+            // con esto manejamos el intervalo. Si está despierto, 10 segundos. Sino 30
+            clearInterval(intervaloVida);
+            if (estaDespierto) {
+                console.log('E.T está despierto. La vida se controla cada 10 segundos');
+                intervaloVida = setInterval(chequearVida, 10000);
+            } else {
+                console.log('E.T está durmiendo. La vida se controla cada 30 segundos');
+                intervaloVida = setInterval(chequearVida, 30000);
+            }
+             
+            
+           /* Logica vieja
+
+            if (nuevoEstado !== estadoActual) {
+                 estadoActual = nuevoEstado;
+                 clearInterval(intervaloVida); // Reiniciar el intervalo si el estado cambia
+                 intervaloVida = setInterval(chequearVida, 10000); // Chequear vida cada 10 segundos
+             }
+           */
+            
 
             broadcast({
                 temperatura,
                 humedad,
                 estado: estadoActual,
-                vida: vidaActual
+                vida: vidaActual,
+                despierto: estaDespierto
             });
 
-            client.publish('estado', JSON.stringify({
+            client.publish('2-Enviar', JSON.stringify({
                 temperatura: ultimaTemperatura,
                 humedad: ultimaHumedad,
                 vida: vidaActual,
-                estado: estadoActual
+                estado: estadoActual,
+                despierto: estaDespierto
             }));
 
             const nuevaTemperatura = new Temperatura({ valor: temperatura, humedad, estado: estadoActual });
@@ -222,7 +264,7 @@ function chequearVida() {
         vidaActual--;
 
 
-        client.publish('estado', JSON.stringify({
+        client.publish('2-Enviar', JSON.stringify({
             vida_disminuida_a: vidaActual,
         }));
 
@@ -231,7 +273,7 @@ function chequearVida() {
             estadoActual = 'Muerto';
             vidaActual = 0;
 
-            client.publish('estado', JSON.stringify({
+            client.publish('2-Enviar', JSON.stringify({
                 estado: estadoActual,
             }));
 
@@ -245,7 +287,8 @@ function chequearVida() {
             temperatura: ultimaTemperatura,
             humedad: ultimaHumedad,
             estado: estadoActual,
-            vida: vidaActual
+            vida: vidaActual,
+            despierto: estaDespierto
         });
     } else if (estadoActual === 'Ideal') {
         console.log('Estado ideal, la vida no disminuye.');
