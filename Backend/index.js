@@ -107,7 +107,7 @@ app.post('/curar', (req, res) => {
 
     res.status(200).json({ message: `Vida incrementada a ${vidaActual}` });
 
-    client.publish('2-Enviar', JSON.stringify({
+    client.publish('estado', JSON.stringify({
         vida_aumentada_a: vidaActual,
     }));
 });
@@ -136,7 +136,7 @@ app.post('/revivir', (req, res) => {
     res.status(200).json({ message: 'Sistema revivido con vida completa y estado "Ideal".' });
 
 
-    client.publish('2-Enviar', JSON.stringify({
+    client.publish('estado', JSON.stringify({
         temperatura: 26,      //Mando una temperatura hardcodeada por mqtt cuando lo revivimos
         humedad: ultimaHumedad,  //La humedad sigue siendo la última capturada
         vida: vidaActual,
@@ -154,16 +154,16 @@ app.listen(port, () => {
 client.on('connect', () => {
     console.log('Conectado al broker MQTT');
 
-    client.subscribe('1-Recibir', (err) => {
+    client.subscribe('ete', (err) => {
         if (!err) {
-            console.log('Suscrito al tema 1-Recibir');
+            console.log('Suscrito al tema ete');
         }
     });
 });
 
 // Manejar los mensajes de MQTT
 client.on('message', async (topic, message) => {
-    if (topic === '1-Recibir') {
+    if (topic === 'ete') {
         const msgString = message.toString().trim();
 
         if (estadoActual === 'Muerto') {
@@ -241,7 +241,7 @@ client.on('message', async (topic, message) => {
                 despierto: estaDespierto
             });
 
-            client.publish('2-Enviar', JSON.stringify({
+            client.publish('estado', JSON.stringify({
                 temperatura: ultimaTemperatura,
                 humedad: ultimaHumedad,
                 vida: vidaActual,
@@ -264,7 +264,7 @@ function chequearVida() {
         vidaActual--;
 
 
-        client.publish('2-Enviar', JSON.stringify({
+        client.publish('estado', JSON.stringify({
             vida_disminuida_a: vidaActual,
         }));
 
@@ -273,7 +273,7 @@ function chequearVida() {
             estadoActual = 'Muerto';
             vidaActual = 0;
 
-            client.publish('2-Enviar', JSON.stringify({
+            client.publish('estado', JSON.stringify({
                 estado: estadoActual,
             }));
 
