@@ -45,8 +45,12 @@ const rangosTemperatura = {
 };
 
 // Crear el servidor WebSocket
-const wss = new WebSocket.Server({ port: wsPort });
-
+//const wss = new WebSocket.Server({ port: wsPort });
+const wss = new WebSocket.Server({ 
+    server: app.listen(port, () => {
+        console.log(`Servidor Express escuchando en http://localhost:${port}`);
+    })
+});
 // Variables de estado
 let estadoActual = null;
 let vidaActual = 5; // Vida inicial
@@ -148,10 +152,11 @@ app.post('/revivir', (req, res) => {
 });
 
 // Iniciar el servidor Express
+/*
 app.listen(port, () => {
     console.log(`Servidor Express escuchando en http://localhost:${port}`);
 });
-
+*/
 // Conexiones MQTT
 client.on('connect', () => {
     console.log('Conectado al broker MQTT');
