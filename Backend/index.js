@@ -8,7 +8,9 @@ const { clear } = require('console');
 
 // Configuración del servidor Express
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 3001;
+const wsPort = process.env.WS_PORT || 8080;
+//port y wsPort están configuradas como variables de entorno en el despliegue de back en render
 
 // Middleware para permitir CORS y parsear JSON
 app.use(cors());
@@ -43,7 +45,7 @@ const rangosTemperatura = {
 };
 
 // Crear el servidor WebSocket
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({ port: wsPort });
 
 // Variables de estado
 let estadoActual = null;
