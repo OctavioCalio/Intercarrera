@@ -4,17 +4,74 @@
   padding: 10px; /* Espaciado interno */
 }
 
+.alien-container {
+  display: flex;
+  align-items: flex-start; /* Alinea los elementos en la parte superior */
+  justify-content: center;
+  position: relative;
+  margin-top: 0.5vw;
+}
+
+.estado-luz-icon {
+  position: absolute;
+  left: 0; 
+  top: auto; 
+  width: 3.4vw; 
+  height: auto;
+  margin-left: 0.5vw;
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+  opacity: 1; 
+}
+
+.estado-luz-icon.sol {
+  animation: solDesplazarse 0.5s forwards; 
+}
+
+.estado-luz-icon.luna {
+  animation: lunaAparecer 0.5s forwards; 
+}
+
+@keyframes solDesplazarse {
+  0% {
+    transform: translateX(-0.5vw);
+    opacity: 1; /* Asegúrate de que comience visible */
+  }
+  100% {
+    transform: translateY(0); 
+    opacity: 1; 
+  }
+}
+
+@keyframes lunaAparecer {
+  0% {
+    transform: translateX(-0.5vw); 
+    opacity: 0; 
+  }
+  100% {
+    transform: translateX(0); 
+    opacity: 1; 
+  }
+}
+
+.fade-out {
+  opacity: 0; 
+  transform: translateX(2.5vw);
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+
+
 .alien {
   width: 15vw; /* Usa una unidad relativa para el ancho */
   height: auto;
   display: block;
-  margin: 20px auto; /* Espaciado vertical */
-  transition: opacity 0.2s ease-in-out;
-  opacity: 1;
+  margin: auto; /* Espaciado vertical */
+  /* No se aplica transición de opacidad aquí */
+  transition: filter 0.3s ease; /* Solo la transición de brillo */
+  opacity: 1; /* Asegúrate de que comience completamente visible */
 }
 
-.alien.fade-out {
-  opacity: 0;
+.alien.dimmed {
+  filter: brightness(0.6); /* Ajusta el nivel de brillo para el efecto de oscuridad */
 }
 
 .title {

@@ -8,7 +8,7 @@ const FeedButton = ({ onClick, disabled }) => {
     const vidaAIncrementar = 1; // Define cuánta vida quieres añadir
 
     try {
-      const response = await fetch('http://localhost:3001/curar', {
+      const response = await fetch('https://intercarrera-back.onrender.com/curar', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

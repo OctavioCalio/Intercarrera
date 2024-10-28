@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../Styles/Content.css";
 import { useAuth0 } from "@auth0/auth0-react";
 import Spinner from 'react-bootstrap/Spinner';
@@ -10,22 +10,16 @@ const Content = ({ setEstadoAlien }) => {
   const { user, isAuthenticated, isLoading } = useAuth0();
   const [estado, setEstado] = useState('');
   const [imagen, setImagen] = useState('/Images/alien-normal-big.gif');
+  const [estadoLuz, setEstadoLuz] = useState('Desconocido');
+  const [imagenLuz, setImagenLuz] = useState('/Images/sol-pixel.png'); // Asigna un valor inicial aquí
+  const luzImgRef = useRef(null); // Referencia para la imagen de luz
 
-  useEffect(() => {
-    const img = document.getElementById('alien');
-    if (img) {
-        img.classList.add('fade-out');
-        setTimeout(() => {
-            setImagen(getImagen(estado));
-            img.classList.remove('fade-out');
-        }, 200); // Duración de la transición
-    }
+  // Función para obtener la imagen de luz según el estadoLuz
+  const getImagenLuz = () => {
+    return estadoLuz === 'Luz encendida' ? '/Images/sol-pixel.png' : '/Images/luna-pixel.png';
+  };
 
-    // Actualiza el estado del alien en el componente App
-    setEstadoAlien(estado);
-
-  }, [estado, setEstadoAlien]);
-
+  // Función para obtener la imagen del alien según su estado
   const getImagen = (estado) => {
     switch (estado) {
       case 'Muerto':
@@ -41,6 +35,30 @@ const Content = ({ setEstadoAlien }) => {
     }
   };
 
+  // Efecto para manejar cambios en el estado del alien
+  useEffect(() => {
+    setImagen(getImagen(estado));
+    setEstadoAlien(estado);
+  }, [estado, setEstadoAlien]);
+
+  // Efecto para manejar cambios en estadoLuz
+  useEffect(() => {
+    if (luzImgRef.current) {
+      luzImgRef.current.classList.add('fade-out'); // Inicia el fade out
+
+      const fadeOutDuration = 500; // Duración del fade out
+
+      // Cambia la imagen después del fade out
+      const timer = setTimeout(() => {
+        setImagenLuz(getImagenLuz()); // Cambia el estado de la imagen de luz
+        luzImgRef.current.classList.remove('fade-out'); // Elimina la clase para reiniciar el efecto
+      }, fadeOutDuration);
+
+      // Limpia el temporizador si el componente se desmonta
+      return () => clearTimeout(timer);
+    }
+  }, [estadoLuz]); // Este efecto solo se activará cuando estadoLuz cambie
+
   return (
     <>
       {isLoading ? (
@@ -51,10 +69,23 @@ const Content = ({ setEstadoAlien }) => {
         </div>
       ) : isAuthenticated ? (
         <div className="content">
-          <Datos setEstado={setEstado}></Datos>
-          <img id="alien" src={imagen} alt="App Icon" className="alien" />
-          {estado !== 'Muerto' && <FeedButton></FeedButton>}
-          {estado === 'Muerto' && <RevivirButton></RevivirButton>}
+          <Datos setEstado={setEstado} setEstadoLuz={setEstadoLuz} />
+          <div className="alien-container">
+            <img 
+              ref={luzImgRef} // Usar la referencia para la imagen de luz
+              src={imagenLuz} // Usa el estado para la imagen de luz
+              alt="Estado de Luz" 
+              className={`estado-luz-icon ${estadoLuz === 'Luz apagada' ? 'dimmed' : ''}`} 
+            />
+            <img 
+              id="alien" 
+              src={imagen} 
+              alt="Alien" 
+              className={`alien ${estadoLuz === 'Luz apagada' ? 'dimmed' : ''}`} 
+            />
+          </div>
+          {estado !== 'Muerto' && <FeedButton />}
+          {estado === 'Muerto' && <RevivirButton />}
         </div>
       ) : (
         <div className="content">

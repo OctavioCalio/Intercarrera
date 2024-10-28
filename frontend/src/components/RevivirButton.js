@@ -6,7 +6,7 @@ const RevivirButton = () => {
 
   const handleRevivir = async () => {
     try {
-      const response = await fetch('http://localhost:3001/revivir', {
+      const response = await fetch('https://intercarrera-back.onrender.com/revivir', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

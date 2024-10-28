@@ -4,13 +4,14 @@ import Temperatura from "./Temperatura";
 import Estado from "./Estado";
 import { useState, useEffect } from 'react';
 
-const Datos = ({ setEstado }) => {
+const Datos = ({ setEstado, setEstadoLuz }) => {
   const [estado, actualizarEstado] = useState('Esperando');
   const [temperatura, setTemperatura] = useState('...');
   const [vidaActual, setVidaActual] = useState();
+  const [estadoLuz, actualizarEstadoLuz] = useState('Desconocido');
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8080');
+    const ws = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
 
     ws.onopen = () => {
       console.log('Conexión WebSocket establecida desde el front - Datos');
@@ -24,10 +25,10 @@ const Datos = ({ setEstado }) => {
       actualizarEstado(data.estado);
       setVidaActual(data.vida);
 
-      console.log('Estado actualizado:', data.estado);
-      console.log('Vida recibida desde el front: ' + data.vida);
+      const luzEstado = data.despierto ? 'Luz encendida' : 'Luz apagada';
+      actualizarEstadoLuz(luzEstado);
+      setEstadoLuz(luzEstado); // Enviamos el estado de la luz a Content
 
-      // Actualizamos el estado que controla la imagen en Content
       setEstado(data.estado);
     };
 
@@ -42,7 +43,7 @@ const Datos = ({ setEstado }) => {
     return () => {
       ws.close();
     };
-  }, [setEstado]);
+  }, [setEstado, setEstadoLuz]);
 
   return (
     <div className="Datos">
