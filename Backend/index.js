@@ -187,7 +187,7 @@ client.on('message', async (topic, message) => {
             const data = JSON.parse(msgString);
             const temperatura = parseFloat(data.temperatura);
             const humedad = parseFloat(data.humedad);
-            const luz = parseInt(data.luz) === 1; //pasa a booleano
+            const luz = parseInt(data.ldr) === 1; //pasa a booleano
 
             if (isNaN(temperatura) || isNaN(humedad)) {
                 console.error(`Mensaje recibido no es un número válido: '${msgString}'`);
